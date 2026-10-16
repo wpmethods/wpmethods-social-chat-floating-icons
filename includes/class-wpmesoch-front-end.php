@@ -1,349 +1,198 @@
 <?php
+/**
+ * Frontend assets and accessible chat widget.
+ *
+ * @package WPMESOCH
+ */
+
 namespace WPMESOCH;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
+/**
+ * Plugin frontend.
+ */
 class Wpmesoch_Front_End {
-    public function __construct() {
-        add_action('wp_footer', [$this, 'wpmesoch_render_chat_buttons']);
-        add_action('wp_enqueue_scripts', [$this, 'wpmesoch_enqueue_scripts']);
-    }
+	/**
+	 * Cached validated options.
+	 *
+	 * @var array|null
+	 */
+	private $options;
 
-    public function wpmesoch_enqueue_scripts() {
-        $min_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-        $this->wpmesoch_maybe_enqueue_fontawesome();
-        wp_enqueue_style('wpmesoch-css', WPMESOCH_WPMETHODS_URL . 'assets/css/front-end'. $min_suffix . '.css', [], WPMESOCH_PLUGIN_VERSION);
-        
-        //Enqueue the inline css
-        $options = get_option('wpmesoch_settings');
+	/**
+	 * Register WordPress hooks.
+	 */
+	public function __construct() {
+		add_action( 'wp_footer', array( $this, 'wpmesoch_render_chat_buttons' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wpmesoch_enqueue_scripts' ) );
+	}
 
-        $toggle_color = $options['toggle_bg_color'] ? $options['toggle_bg_color'] : '#00DA62';
-        $toggle_g_color = $options['toggle_gbg_color'] ? $options['toggle_gbg_color'] : '';
-        $icon_color = $options['icon_color'] ? $options['icon_color'] : '#FFFFFF';
-        $icon_size = $options['icon_size'] ? $options['icon_size'] : '30';
-        $height_width = $options['height_width'] ? $options['height_width'] : '50';
-        $hover_color = $options['hover_color'] ?  $options['hover_color'] : '#128C7E';
-        $pulse_animation_border_color = $options['pulse_animation_border_color'] ?  $options['pulse_animation_border_color'] : '#00DA62';
+	/**
+	 * Read validated options once per request.
+	 *
+	 * @return array
+	 */
+	private function settings() {
+		if ( null === $this->options ) {
+			$this->options                   = Wpmesoch_Settings::get();
+			$this->options['wpmesoch_links'] = array_values(
+				array_filter(
+					$this->options['wpmesoch_links'],
+					static function ( $link ) {
+						return '1' === $link['enabled'];
+					}
+				)
+			);
+		}
+		return $this->options;
+	}
 
-        // Position settings
-        $position = $options['position'] ?? 'right'; // 'left' or 'right'
-        $bottom_offset = $options['bottom_offset'] ?? '20px';
-        $left_offset = $options['left_offset'] ?? '20px';
-        $right_offset = $options['right_offset'] ?? '20px';
+	/**
+	 * Load local assets only when there are configured links.
+	 */
+	public function wpmesoch_enqueue_scripts() {
+		$options = $this->settings();
+		if ( empty( $options['wpmesoch_links'] ) ) {
+			return;
+		}
+		$suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$dependencies = array();
+		if ( '1' === $options['load_fontawesome'] ) {
+			// Registration by another plugin does not mean its font is loaded.
+			wp_enqueue_style( 'wpmesoch-fontawesome', WPMESOCH_WPMETHODS_URL . 'assets/css/all.min.css', array(), '6.7.2' );
+			$dependencies[] = 'wpmesoch-fontawesome';
+		}
+		wp_enqueue_style( 'wpmesoch-css', WPMESOCH_WPMETHODS_URL . 'assets/css/front-end' . $suffix . '.css', $dependencies, WPMESOCH_PLUGIN_VERSION );
+		$background = $options['toggle_gbg_color'] ? 'linear-gradient(120deg,' . $options['toggle_bg_color'] . ',' . $options['toggle_gbg_color'] . ')' : $options['toggle_bg_color'];
+		$css        = sprintf(
+			'#lcWpmethodsChatContainer.wpmesoch-chat-container{--wpmesoch-size:%1$dpx;--wpmesoch-icon-size:%2$dpx;--wpmesoch-bg:%3$s;--wpmesoch-color:%4$s;--wpmesoch-hover:%5$s;--wpmesoch-pulse:%6$s;bottom:%7$s;%8$s:%9$s;%10$s:auto;align-items:%11$s;}',
+			$options['height_width'],
+			$options['icon_size'],
+			$background,
+			$options['icon_color'],
+			$options['hover_color'],
+			$options['pulse_animation_border_color'],
+			$options['bottom_offset'],
+			$options['position'],
+			$options[ $options['position'] . '_offset' ],
+			'left' === $options['position'] ? 'right' : 'left',
+			'left' === $options['position'] ? 'flex-start' : 'flex-end'
+		);
+		wp_add_inline_style( 'wpmesoch-css', $css );
+		if ( '' !== $options['custom_css'] ) {
+			wp_add_inline_style( 'wpmesoch-css', $options['custom_css'] );
+		}
+		wp_enqueue_script( 'wpmesoch-js', WPMESOCH_WPMETHODS_URL . 'assets/js/front-end' . $suffix . '.js', array(), WPMESOCH_PLUGIN_VERSION, true );
+	}
 
-        // Decide position style
-        $side_offset_style = $position === 'left'
-        ? 'left: ' . esc_attr($left_offset) . '; right: auto;'
-        : 'right: ' . esc_attr($right_offset) . '; left: auto;';
-        
+	/**
+	 * Match services by exact URL host rather than labels or partial matches.
+	 *
+	 * @param string $url Contact URL.
+	 * @return string
+	 */
+	private function service( $url ) {
+		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+		if ( in_array( $host, array( 'wa.me', 'api.whatsapp.com', 'web.whatsapp.com' ), true ) ) {
+			return 'whatsapp';
+		}
+		if ( in_array( $host, array( 'm.me', 'www.m.me' ), true ) ) {
+			return 'messenger';
+		}
+		return '';
+	}
 
-        // Inline CSS for the chat button
-        $wpmesoch_inline_css = "
-            .wpmesoch-chat-toggle,
-            [type=button].wpmesoch-chat-btn {
-                height: " . esc_attr($height_width) . "px;
-                width: " . esc_attr($height_width) . "px;
-            }
-        
-            .wpmesoch-chat-container {
-                align-items: " . ($position === 'left' ? 'flex-start' : 'flex-end') . ";
-                bottom: " . esc_attr($bottom_offset) . ";
-                {$side_offset_style}
-                z-index: 9999;
-            }
-        
-            .wpmesoch-chat-toggle {
-                color: " . esc_attr($icon_color) . ";
-                background: " . ($toggle_g_color
-                    ? 'linear-gradient(120deg, ' . esc_attr($toggle_color) . ' 50%, ' . esc_attr($toggle_g_color) . ' 100%)'
-                    : esc_attr($toggle_color)) . ";
-            }
-        
-            .wpmesoch-chat-toggle:hover {
-                background: " . esc_attr($hover_color) . ";
-            }
-        
-            .wpmesoch-chat-btn i,
-            .wpmesoch-chat-toggle i {
-                pointer-events: none;
-                font-size: " . esc_attr($icon_size) . "px;
-            }
-        
-            .sfiw-icons {
-                flex-direction: " . ($position === 'left' ? 'row-reverse' : 'row') . ";
-            }
-        
-            .label-sfiw {
-                border-radius: " . ($position === 'left' ? '0px 20px 20px 0px' : '20px 0px 0px 20px') . ";
-                transform: translateY(-50%) " . ($position === 'left' ? 'translateX(-10px)' : 'translateX(10px)') . ";
-                " . ($position === 'left'
-                    ? 'left: 65%; margin-left: 8px; padding-left: 25px;'
-                    : 'right: 65%; margin-right: 8px; padding-right: 25px;') . "
-            }
-        
-            @keyframes wpmesoch-pulse {
-                0% {
-                    box-shadow: 0 0 0 0 " . esc_attr($pulse_animation_border_color) . ";
-                    transform: scale(1);
-                }
-            
-                70% {
-                    transform: scale(1.2);
-                    box-shadow: 0 0 0 7px rgba(242, 105, 34, 0);
-                }
-        
-                100% {
-                    transform: scale(1);
-                    box-shadow: 0 0 0 0 rgba(242, 105, 34, 0);
-                }
-            }
-        ";
-        
+	/**
+	 * Render contact links and chat panels.
+	 */
+	public function wpmesoch_render_chat_buttons() {
+		$options = $this->settings();
+		if ( empty( $options['wpmesoch_links'] ) ) {
+			return;
+		}
+		$single   = 1 === count( $options['wpmesoch_links'] );
+		$message  = trim( $options['custom_text'] . "\n" . $this->wpmesoch_get_product_message() );
+		$title    = $options['chat_title'] ? $options['chat_title'] : __( 'How can we help?', 'wpmethods-social-chat-floating-icons' );
+		$greeting = $options['chat_greeting'] ? $options['chat_greeting'] : __( 'Hi! Welcome to our store. Need help choosing a product, checking delivery, or asking about your order? Send us a message and our team will be happy to help.', 'wpmethods-social-chat-floating-icons' );
+		?>
+		<div class="wpmesoch-chat-container <?php echo $single ? 'wpmesoch-single' : 'wpmesoch-multiple'; ?> wpmesoch-position-<?php echo esc_attr( $options['position'] ); ?>" id="lcWpmethodsChatContainer">
+			<?php if ( '1' === $options['welcome_enabled'] ) : ?>
+				<div class="wpmesoch-welcome" data-delay="<?php echo esc_attr( $options['welcome_delay'] ); ?>" data-once="<?php echo esc_attr( $options['welcome_once'] ); ?>" hidden>
+					<button type="button" class="wpmesoch-welcome-message"><span class="wpmesoch-welcome-label"><?php echo esc_html( $options['welcome_title'] ? $options['welcome_title'] : __( 'Welcome to our store!', 'wpmethods-social-chat-floating-icons' ) ); ?></span><span><?php echo esc_html( $options['welcome_text'] ? $options['welcome_text'] : __( 'Need a hand? Ask us about products, delivery or your order. We are happy to help!', 'wpmethods-social-chat-floating-icons' ) ); ?></span></button>
+					<button type="button" class="wpmesoch-welcome-dismiss" aria-label="<?php esc_attr_e( 'Dismiss welcome message', 'wpmethods-social-chat-floating-icons' ); ?>"><span class="wpmesoch-close-icon" aria-hidden="true"></span></button>
+				</div>
+				<?php if ( $options['welcome_badge'] > 0 ) : ?>
+					<span class="wpmesoch-welcome-badge" aria-hidden="true" hidden><?php echo esc_html( $options['welcome_badge'] ); ?></span>
+				<?php endif; ?>
+			<?php endif; ?>
+			<div class="wpmesoch-chat-options" id="wpmesoch-chat-options">
+				<?php
+				foreach ( $options['wpmesoch_links'] as $link ) :
+					$service    = $this->service( $link['url'] );
+					$label      = $link['label'] ? $link['label'] : ( $service ? ( 'whatsapp' === $service ? 'WhatsApp' : 'Messenger' ) : __( 'Open contact link', 'wpmethods-social-chat-floating-icons' ) );
+					$background = $link['s_bg_color'] ? 'linear-gradient(120deg,' . $link['bg_color'] . ',' . $link['s_bg_color'] . ')' : $link['bg_color'];
+					?>
+					<div class="sfiw-icons">
+						<span class="label-sfiw" aria-hidden="true"><?php echo esc_html( $label ); ?></span>
+						<a class="wpmesoch-chat-btn" href="<?php echo esc_url( $link['url'] ); ?>" target="_blank" rel="noopener noreferrer"
+							aria-label="<?php echo esc_attr( $label ); ?>" data-label="<?php echo esc_attr( $label ); ?>"
+							data-service="<?php echo esc_attr( $service ); ?>" data-chatbox="<?php echo esc_attr( $service ? $options[ $service . '_chatbox' ] : '0' ); ?>"
+							data-base-message="<?php echo esc_attr( $message ); ?>" data-is-product-track="<?php echo esc_attr( $options['track_woo_product'] ); ?>"
+							style="background:<?php echo esc_attr( $background ); ?>;color:<?php echo esc_attr( $link['color'] ); ?>;">
+							<i class="<?php echo esc_attr( $link['icon'] ); ?>" aria-hidden="true"></i>
+						</a>
+					</div>
+				<?php endforeach; ?>
+			</div>
+			<section class="wpmesoch-panel" id="wpmesoch-panel" role="dialog" aria-labelledby="wpmesoch-panel-title" hidden>
+				<header class="wpmesoch-panel-header">
+					<div><strong id="wpmesoch-panel-title"><?php echo esc_html( $title ); ?></strong><span id="wpmesoch-panel-channel"></span></div>
+					<button type="button" class="wpmesoch-panel-close" aria-label="<?php esc_attr_e( 'Close chat panel', 'wpmethods-social-chat-floating-icons' ); ?>"><span class="wpmesoch-close-icon" aria-hidden="true"></span></button>
+				</header>
+				<div class="wpmesoch-panel-body">
+					<p class="wpmesoch-greeting"><?php echo esc_html( $greeting ); ?></p>
+					<form class="wpmesoch-message-form">
+						<label for="wpmesoch-message"><?php esc_html_e( 'Your message', 'wpmethods-social-chat-floating-icons' ); ?></label>
+						<textarea id="wpmesoch-message" rows="3" maxlength="2000"></textarea>
+						<p class="wpmesoch-panel-note"><?php esc_html_e( 'Continue in WhatsApp to send your message and receive a reply.', 'wpmethods-social-chat-floating-icons' ); ?></p>
+						<button type="submit" class="wpmesoch-send"><?php esc_html_e( 'Continue in WhatsApp', 'wpmethods-social-chat-floating-icons' ); ?></button>
+					</form>
+					<div class="wpmesoch-messenger" hidden>
+						<p class="wpmesoch-panel-note"><?php esc_html_e( 'Your conversation and replies will open in Messenger.', 'wpmethods-social-chat-floating-icons' ); ?></p>
+						<a class="wpmesoch-send" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Continue in Messenger', 'wpmethods-social-chat-floating-icons' ); ?></a>
+					</div>
+				</div>
+			</section>
+			<?php if ( ! $single ) : ?>
+			<button type="button" class="wpmesoch-chat-toggle wpmesoch-pulse" id="lcWpmethodsChatToggle" hidden aria-expanded="false" aria-controls="wpmesoch-chat-options wpmesoch-panel" aria-label="<?php esc_attr_e( 'Toggle contact options', 'wpmethods-social-chat-floating-icons' ); ?>">
+				<i class="<?php echo esc_attr( $options['toggle_icon_class'] ); ?>" aria-hidden="true"></i><span class="wpmesoch-toggle-close wpmesoch-close-icon" aria-hidden="true" hidden></span>
+			</button>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
 
-        wp_add_inline_style('wpmesoch-css', $wpmesoch_inline_css);
-
-        wp_enqueue_script('wpmesoch-js', WPMESOCH_WPMETHODS_URL . 'assets/js/front-end'. $min_suffix . '.js', ['jquery'], WPMESOCH_PLUGIN_VERSION, true);
-    }
-
-    public function wpmesoch_render_chat_buttons()
-    {// Load settings
-        $options = get_option('wpmesoch_settings');
-
-        // Repeater field should be an array of arrays
-        $wpmesoch_links = $options['wpmesoch_links'] ?? [[
-            'url' => 'https://wa.me/88017900000',
-            'icon' => 'fab fa-whatsapp',
-            'label' => '',
-            'color' => '#ffffff',
-            'bg_color' => '#00DA62',
-            's_bg_color' => '',
-        ]];
-        
-        $toggle_icon_class = $options['toggle_icon_class'] ? $options['toggle_icon_class'] : 'fas fa-comment-dots';
-
-        $limit = apply_filters('wpmethods_social_chat_link_limit', 2);
-
-        if (empty($wpmesoch_links) || !is_array($wpmesoch_links)) {
-            return; // Nothing to render
-        }
-        ?>
-
-        <div class="wpmesoch-chat-container" id="lcWpmethodsChatContainer">
-            <div class="wpmesoch-chat-options" id="chatOptions">
-                <?php foreach (array_slice($wpmesoch_links, 0, $limit) as $link) : 
-                    $url = !empty($link['url']) ? $link['url'] : 'https://wa.me/your-whatsapp-number';
-                    $icon_class = !empty($link['icon']) ? $link['icon'] : 'fab fa-whatsapp';
-                    $label = !empty($link['label']) ? $link['label'] : '';
-                    $color = !empty($link['color']) ? $link['color'] : '#ffffff';
-                    $bg_color = !empty($link['bg_color']) ? $link['bg_color'] : '#00DA62';
-                    $s_bg_color = !empty($link['s_bg_color']) ? $link['s_bg_color'] : '';
-
-                    if (empty($url) || empty($icon_class)) {
-                        continue;
-                    }
-
-                    $custom_text = !empty($options['custom_text']) ? $options['custom_text'] : '';
-                    $is_product_page = function_exists('is_product') && is_product();
-                    $track_product = !empty($options['track_woo_product']) ? $options['track_woo_product'] : '0';
-
-                    $base_message = $is_product_page ? $this->wpmesoch_get_product_message() : '';
-                    if (!empty($custom_text)) {
-                        $base_message = $custom_text . "\n" . $base_message;
-                    }
-
-                    $social_link = esc_url($url);
-                ?>
-                    <div class="sfiw-icons">
-                        <?php if(!empty($label)) {?>
-                        <div class="label-sfiw" style="background: <?php echo esc_attr($bg_color); ?>"><?php echo esc_html($label); ?></div>
-                        <?php }?>
-                        <button type="button"
-                            class="wpmesoch-chat-btn <?php echo sanitize_html_class(strtolower($label)); ?>"
-                            data-url="<?php echo esc_url($social_link); ?>" 
-                            data-base-message="<?php echo esc_attr($base_message); ?>"
-                            data-custom-text="<?php echo esc_attr($custom_text); ?>"
-                            data-is-product="<?php echo $is_product_page ? '1' : '0'; ?>"
-                            data-is-product-track="<?php echo esc_attr($track_product); ?>"
-                            style="background: linear-gradient(120deg, <?php echo esc_attr($bg_color);?> <?php echo $s_bg_color ? '50%,' : '' ; echo esc_attr($s_bg_color); ?> 100%);"
-                        >
-                            <i class="<?php echo esc_attr($icon_class); ?>" style="color: <?php echo esc_attr($color); ?>;"></i>
-                        </button>
-
-                    </div>
-                <?php endforeach; ?>
-            </div>
-         
-            <div class="wpmesoch-chat-toggle wpmesoch-pulse" id="lcWpmethodsChatToggle">
-                <i class="<?php echo esc_attr($toggle_icon_class); ?>" data-toggle-icon="<?php echo esc_attr($toggle_icon_class); ?>" id="lcWpmethodsChatIcon"></i>
-            </div>
-            
-        </div>
-        <?php
-    }
-
-
-
-
-    private function wpmesoch_maybe_enqueue_fontawesome() {
-        global $wp_styles;
-        $already_loaded = false;
-
-        if (!empty($wp_styles->registered)) {
-            foreach ($wp_styles->registered as $handle => $style) {
-                if (strpos($handle, 'fontawesome') !== false || strpos($handle, 'font-awesome') !== false) {
-                    $already_loaded = true;
-                    break;
-                }
-            }
-        }
-
-        if (!$already_loaded) {
-            wp_enqueue_style('fontawesome', WPMESOCH_WPMETHODS_URL . 'assets/css/all.min.css', [], '6.7.2');
-        }
-    }
-
-
-
-    private function wpmesoch_get_product_message() {
-        if (function_exists('is_woocommerce') && is_singular('product')) {
-            $options = get_option('wpmesoch_settings');
-            $track_product = !empty($options['track_woo_product']) ? $options['track_woo_product'] : '0';
-
-            if ($track_product == '0') {
-                return;
-            }
-
-            $product_msg = !empty($options['woo_product_msg']) ? $options['woo_product_msg'] : 'I want to buy this product and product details below';
-            $woo_product_name = !empty($options['woo_product_name']) ? $options['woo_product_name'] : 'Product Name';
-            $woo_product_price = !empty($options['woo_product_price']) ? $options['woo_product_price'] : 'Price';
-
-
-            global $product;
-
-            if ($product && is_a($product, 'WC_Product')) {
-                $title = $product->get_name();
-                $currency_symbol = html_entity_decode(get_woocommerce_currency_symbol(), ENT_HTML5);
-                $currency_code = get_woocommerce_currency();
-
-                $message = "{$product_msg}:\n";
-                $message .= "{$woo_product_name}: {$title}\n";
-
-                // Handle variable product
-                $selected_text = '';
-                $variations_text = '';
-                if ($product->is_type('variable')) {
-                    $variations = $product->get_available_variations();
-                    if (!empty($variations)) {
-                        $is_selected = false;
-                    
-
-                        foreach ($variations as $variation) {
-                            $variation_product = wc_get_product($variation['variation_id']);
-                            $price = number_format((float)$variation_product->get_price(), 2, '.', '');
-                            $attributes = $variation['attributes'];
-                            $attribute_string = '';
-
-                            foreach ($attributes as $key => $value) {
-                                if (!empty($value)) {
-                                    $attribute_name = wc_attribute_label(str_replace('attribute_', '', $key), $product);
-                                    $attribute_string .= "{$attribute_name}: {$value} ";
-                                }
-                            }
-
-                            // Add to variations list with consistent formatting
-                            $variations_text .= "- {$attribute_string}- {$currency_symbol}{$price} {$currency_code}\n";
-
-                            // Detect selected variation from $_GET
-                            $is_selected_var = true;
-                            foreach ($attributes as $key => $value) {
-                                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                                if (!isset($_GET[$key])) {
-                                    $is_selected_var = false;
-                                    break;
-                                }
-
-                                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                                $user_input = sanitize_text_field(wp_unslash($_GET[$key])); // sanitize + unslash
-
-                                if (strtolower($user_input) !== strtolower($value)) {
-                                    $is_selected_var = false;
-                                    break;
-                                }
-                            }
-
-
-                            if ($is_selected_var) {
-                                $is_selected = true;
-                                $regular_price = number_format((float)$variation_product->get_regular_price(), 2, '.', '');
-                                $sale_price = $variation_product->get_sale_price();
-                                if ($sale_price && $sale_price !== $regular_price) {
-                                    $sale_price = number_format((float)$sale_price, 2, '.', '');
-                                    $selected_text = "Selected Variation: {$attribute_string}- {$currency_symbol}{$regular_price}\n";
-                                    $selected_text .= "Original price was: {$currency_symbol}{$regular_price}\n";
-                                    $selected_text .= "*The discounted price is: {$currency_symbol}{$sale_price}.*\n";
-                                    $selected_text .= $plain_description;
-                                } else {
-                                    $selected_text = "*Selected Variation: {$attribute_string}- {$currency_symbol}{$regular_price} {$currency_code}.*\n";
-                                    $selected_text .= $plain_description;
-                                }
-                            }
-                        }
-
-                        // Include variations list only if no variation is selected
-                        if (!$is_selected) {
-                            $message .= "\nVariations:\n" . $variations_text;
-                        } else {
-                            $message .= "\n" . $selected_text;
-                        }
-                    }
-                } else {
-                    // Handle simple product price
-                    $regular_price = number_format((float)$product->get_regular_price(), 2, '.', '');
-                    $sale_price = $product->get_sale_price();
-                    if ($sale_price && $sale_price !== $regular_price) {
-                        $sale_price = number_format((float)$sale_price, 2, '.', '');
-                        $message .= "Original price was: {$currency_symbol}{$regular_price}\n";
-                        $message .= "*The discounted price is: {$currency_symbol}{$sale_price}.*";
-                    } else {
-                        $message .= "*{$woo_product_price}: {$currency_symbol}{$regular_price} {$currency_code}*";
-                    }
-                }
-
-                // Non-variation attributes
-                $attributes = $product->get_attributes();
-                $options_output = '';
-                if (!empty($attributes)) {
-                    foreach ($attributes as $attribute) {
-                        if ($attribute->get_visible() && !$attribute->get_variation()) {
-                            $name = wc_attribute_label($attribute->get_name());
-                            $options = $attribute->get_options();
-                            $option_values = array();
-                            foreach ($options as $option) {
-                                $option_values[] = wc_attribute_label($option);
-                            }
-                            if (!empty($option_values)) {
-                                $options_output .= "- {$name}: " . implode(', ', $option_values) . "\n";
-                            }
-                        }
-                    }
-
-                    if (!empty($options_output)) {
-                        $message .= "\nOptions:\n" . $options_output;
-                    }
-                }
-
-                return trim($message);
-            }
-        }
-
-        return '';
-    }
-
-    
+	/** Build product context once without loading every available variation. */
+	private function wpmesoch_get_product_message() {
+		$options = $this->settings();
+		if ( '1' !== $options['track_woo_product'] || ! function_exists( 'wc_get_product' ) || ! is_singular( 'product' ) ) {
+			return '';
+		}
+		$product = wc_get_product( get_queried_object_id() );
+		if ( ! $product ) {
+			return '';
+		}
+		$message  = ( $options['woo_product_msg'] ? $options['woo_product_msg'] : __( 'I am interested in this product', 'wpmethods-social-chat-floating-icons' ) ) . "\n";
+		$message .= ( $options['woo_product_name'] ? $options['woo_product_name'] : __( 'Product', 'wpmethods-social-chat-floating-icons' ) ) . ': ' . $product->get_name() . "\n";
+		$message .= ( $options['woo_product_price'] ? $options['woo_product_price'] : __( 'Price', 'wpmethods-social-chat-floating-icons' ) ) . ': ' . html_entity_decode( wp_strip_all_tags( $product->get_price_html() ), ENT_QUOTES, 'UTF-8' ) . "\n";
+		foreach ( $product->get_attributes() as $attribute ) {
+			if ( $attribute->get_visible() && ! $attribute->get_variation() ) {
+				$message .= wc_attribute_label( $attribute->get_name() ) . ': ' . $product->get_attribute( $attribute->get_name() ) . "\n";
+			}
+		}
+		return $message . get_permalink( $product->get_id() );
+	}
 }
-
-
-
-
