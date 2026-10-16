@@ -51,6 +51,15 @@ jQuery(function ($) {
         });
     }
 
+    function setExpanded(row, expanded) {
+        row.querySelector('.wpmesoch-channel-toggle').setAttribute('aria-expanded', String(expanded));
+        row.querySelector('.wpmesoch-fields-grid').hidden = !expanded;
+        row.classList.toggle('wpmesoch-channel-collapsed', !expanded);
+    }
+    function expandChannel(row) {
+        Array.from(container.children).forEach(function (item) { setExpanded(item, item === row); });
+    }
+
     function refresh() {
         const rows = Array.from(container.children);
         add.hidden = false;
@@ -94,12 +103,13 @@ jQuery(function ($) {
     root.classList.add('wpmesoch-enhanced');
     colorPickers(root);
     refresh();
+    if (container.firstElementChild) expandChannel(container.firstElementChild);
     initialized = true;
 
     add.addEventListener('click', function () {
         const fragment = template.content.cloneNode(true);
-        fragment.querySelectorAll('[id], [for], [name]').forEach(function (element) {
-            ['id', 'for', 'name'].forEach(function (attribute) {
+        fragment.querySelectorAll('[id], [for], [name], [aria-controls]').forEach(function (element) {
+            ['id', 'for', 'name', 'aria-controls'].forEach(function (attribute) {
                 if (element.hasAttribute(attribute)) element.setAttribute(attribute, element.getAttribute(attribute).replace(/__INDEX__/g, counter));
             });
         });
@@ -108,26 +118,39 @@ jQuery(function ($) {
         counter++;
         colorPickers(row);
         refresh();
+        expandChannel(row);
         dirty();
         row.querySelector('[data-field="url"]').focus();
     });
     container.addEventListener('click', function (event) {
+        const header = event.target.closest('.wpmesoch-channel-header');
+        if (header && !event.target.closest('.wpmesoch-channel-actions, .wpmesoch-drag-handle')) {
+            const row = header.closest('.wpmesoch-admin-field-group');
+            if (row.querySelector('.wpmesoch-channel-toggle').getAttribute('aria-expanded') === 'true') {
+                setExpanded(row, false);
+            } else {
+                expandChannel(row);
+            }
+            return;
+        }
         const button = event.target.closest('button');
         if (!button) return;
         const row = button.closest('.wpmesoch-admin-field-group');
         if (button.classList.contains('wpmesoch-admin-remove-field')) {
             const next = row.nextElementSibling || row.previousElementSibling;
+            const wasExpanded = !row.querySelector('.wpmesoch-fields-grid').hidden;
             row.remove();
             refresh();
-            (next ? next.querySelector('[data-field="url"]') : add).focus();
+            if (next && wasExpanded) expandChannel(next);
+            (next ? next.querySelector('.wpmesoch-channel-toggle') : add).focus();
         } else if (button.classList.contains('wpmesoch-move-up') && row.previousElementSibling) {
             container.insertBefore(row, row.previousElementSibling);
             refresh();
-            row.querySelector('[data-field="url"]').focus();
+            row.querySelector('.wpmesoch-channel-toggle').focus();
         } else if (button.classList.contains('wpmesoch-move-down') && row.nextElementSibling) {
             container.insertBefore(row.nextElementSibling, row);
             refresh();
-            row.querySelector('[data-field="url"]').focus();
+            row.querySelector('.wpmesoch-channel-toggle').focus();
         } else return;
         dirty();
     });

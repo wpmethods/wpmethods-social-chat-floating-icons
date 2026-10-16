@@ -159,8 +159,11 @@ class Wpmesoch_Admin_Settings {
 		<div class="wpmesoch-admin-field-group">
 			<div class="wpmesoch-channel-header">
 				<span class="wpmesoch-drag-handle dashicons dashicons-menu" aria-hidden="true"></span>
-				<div class="wpmesoch-admin-preview-icon"><i class="<?php echo esc_attr( $link['icon'] ?? 'fab fa-whatsapp' ); ?>" aria-hidden="true"></i></div>
-				<strong class="wpmesoch-channel-name"><?php echo esc_html( ! empty( $link['label'] ) ? $link['label'] : __( 'Contact channel', 'wpmethods-social-chat-floating-icons' ) ); ?></strong>
+				<button type="button" class="wpmesoch-channel-toggle" aria-expanded="true" aria-controls="wpmesoch-link-<?php echo esc_attr( $index ); ?>-fields">
+					<span class="wpmesoch-admin-preview-icon"><i class="<?php echo esc_attr( $link['icon'] ?? 'fab fa-whatsapp' ); ?>" aria-hidden="true"></i></span>
+					<strong class="wpmesoch-channel-name"><?php echo esc_html( ! empty( $link['label'] ) ? $link['label'] : __( 'Contact channel', 'wpmethods-social-chat-floating-icons' ) ); ?></strong>
+					<span class="wpmesoch-channel-chevron dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
+				</button>
 				<div class="wpmesoch-channel-actions">
 					<label class="wpmesoch-channel-visibility" for="wpmesoch-link-<?php echo esc_attr( $index ); ?>-enabled">
 						<input type="hidden" name="wpmesoch_settings[wpmesoch_links][<?php echo esc_attr( $index ); ?>][enabled]" value="0" />
@@ -172,7 +175,7 @@ class Wpmesoch_Admin_Settings {
 					<button type="button" class="wpmesoch-admin-remove-field"><span class="dashicons dashicons-trash" aria-hidden="true"></span><span><?php esc_html_e( 'Remove', 'wpmethods-social-chat-floating-icons' ); ?></span></button>
 				</div>
 			</div>
-			<div class="wpmesoch-fields-grid">
+			<div class="wpmesoch-fields-grid" id="wpmesoch-link-<?php echo esc_attr( $index ); ?>-fields">
 				<?php foreach ( $fields as $key => $label ) : ?>
 					<div class="wpmesoch-field <?php echo 'url' === $key ? 'wpmesoch-field-wide' : ''; ?>">
 						<label for="wpmesoch-link-<?php echo esc_attr( $index . '-' . $key ); ?>"><?php echo esc_html( $label ); ?></label>
