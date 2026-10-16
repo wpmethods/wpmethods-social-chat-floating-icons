@@ -2,7 +2,7 @@
 Contributors: wpmethods, ajharrashed
 Tags: Social Chat Floating Icon, live chat, facebook messenger, whatsapp live chat
 Requires at least: 5.9
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.1.0
 License: GPLv2 or later

@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WPMESOCH_WPMETHODS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPMESOCH_WPMETHODS_URL', plugin_dir_url( __FILE__ ) );
 
-define( 'WPMESOCH_PLUGIN_VERSION', '1.5.3' );
+define( 'WPMESOCH_PLUGIN_VERSION', '1.1.0' );
 
 // Autoload Classes.
 require_once WPMESOCH_WPMETHODS_PATH . 'file_autoloader/autoload.php';
