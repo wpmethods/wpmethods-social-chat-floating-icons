@@ -8,7 +8,7 @@
     const options = container.querySelector('.wpmesoch-chat-options');
     const panel = container.querySelector('.wpmesoch-panel');
     const form = panel.querySelector('form');
-    const messageInput = panel.querySelector('textarea');
+    const messageInput = form.querySelector('textarea');
     const messenger = panel.querySelector('.wpmesoch-messenger');
     const single = container.classList.contains('wpmesoch-single');
     let activeLink = null;
@@ -92,7 +92,7 @@
         return message.trim();
     }
 
-    function whatsappUrl(link, typedMessage) {
+    function messageUrl(link, typedMessage) {
         const url = new URL(link.href);
         const parts = [url.searchParams.get('text') || '', context(link), typedMessage || ''].filter(Boolean);
         if (parts.length) {
@@ -110,7 +110,9 @@
     }
 
     container.querySelectorAll('.wpmesoch-chat-btn').forEach(function (link) {
-        if (link.dataset.chatbox === '1') {
+
+        const hasPanel = link.dataset.chatbox === '1';
+        if (hasPanel) {
             link.setAttribute('aria-haspopup', 'dialog');
             link.setAttribute('aria-controls', 'wpmesoch-panel');
             link.setAttribute('aria-expanded', 'false');
@@ -119,11 +121,11 @@
             if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
                 return;
             }
-            if (link.dataset.chatbox !== '1') {
-                if (link.dataset.service === 'whatsapp') {
+            if (!hasPanel) {
+                if (link.dataset.service === 'whatsapp' || link.dataset.service === 'telegram') {
                     // Keep a real link for popup blockers, keyboard use and no-JS fallback.
                     const original = link.href;
-                    link.href = whatsappUrl(link, '');
+                    link.href = messageUrl(link, '');
                     window.setTimeout(function () { link.href = original; }, 0);
                 }
                 return;
@@ -138,16 +140,23 @@
             container.classList.add('wpmesoch-open');
             options.hidden = !single;
             panel.hidden = false;
-            const isWhatsApp = link.dataset.service === 'whatsapp';
+            const hasComposer = link.dataset.service === 'whatsapp' || link.dataset.service === 'telegram';
             panel.dataset.service = link.dataset.service;
             panel.querySelector('#wpmesoch-panel-channel').textContent = link.dataset.label;
-            form.hidden = !isWhatsApp;
-            messenger.hidden = isWhatsApp;
-            messenger.querySelector('a').href = link.href;
-            if (isWhatsApp) {
+            form.hidden = !hasComposer;
+            messenger.hidden = hasComposer;
+            if (hasComposer) {
+                form.querySelector('.wpmesoch-panel-note').textContent = form.querySelector('.wpmesoch-panel-note').dataset[link.dataset.service];
+                form.querySelector('.wpmesoch-send').textContent = form.querySelector('.wpmesoch-send').dataset[link.dataset.service];
+            }
+            const continueLink = messenger.querySelector('a');
+            continueLink.href = link.href;
+
+
+            if (hasComposer) {
                 messageInput.focus();
             } else {
-                messenger.querySelector('a').focus();
+                continueLink.focus();
             }
         });
     });
@@ -155,7 +164,7 @@
     form.addEventListener('submit', function (event) {
         event.preventDefault();
         if (activeLink) {
-            window.open(whatsappUrl(activeLink, messageInput.value.trim()), '_blank', 'noopener,noreferrer');
+            window.open(messageUrl(activeLink, messageInput.value.trim()), '_blank', 'noopener,noreferrer');
         }
     });
     panel.querySelector('.wpmesoch-panel-close').addEventListener('click', closePanel);

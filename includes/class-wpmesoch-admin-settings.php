@@ -222,7 +222,7 @@ class Wpmesoch_Admin_Settings {
 					?>
 					<code><?php echo esc_html( $icon ); ?></code><?php endforeach; ?>
 			</div><a href="https://fontawesome.com/v6/search?o=r&m=free" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Browse free icons', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a></details>
-			<details><summary><?php esc_html_e( 'Chat panels & Font Awesome', 'wpmethods-social-chat-floating-icons' ); ?></summary><p><?php esc_html_e( 'WhatsApp and Messenger panels open before continuing in the messaging app. Replies are received in that app.', 'wpmethods-social-chat-floating-icons' ); ?></p><p><?php esc_html_e( 'Keep Load Font Awesome enabled unless your theme or another plugin already supplies compatible icons. This setting controls frontend loading; admin previews always load local icons.', 'wpmethods-social-chat-floating-icons' ); ?></p></details>
+			<details><summary><?php esc_html_e( 'Chat panels & Font Awesome', 'wpmethods-social-chat-floating-icons' ); ?></summary><p><?php esc_html_e( 'WhatsApp, Telegram and Messenger panels open before continuing in the messaging app. Replies are received in that app.', 'wpmethods-social-chat-floating-icons' ); ?></p><p><?php esc_html_e( 'Keep Load Font Awesome enabled unless your theme or another plugin already supplies compatible icons. This setting controls frontend loading; admin previews always load local icons.', 'wpmethods-social-chat-floating-icons' ); ?></p></details>
 			<div class="wpmesoch-community"><span class="wpmesoch-eyebrow"><?php esc_html_e( 'MADE WITH CARE', 'wpmethods-social-chat-floating-icons' ); ?></span><p><?php esc_html_e( 'Enjoying the plugin? Support the creator or explore more tutorials and tools.', 'wpmethods-social-chat-floating-icons' ); ?></p><a class="wpmesoch-coffee" href="https://buymeacoffee.com/ajharrashed" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-coffee" aria-hidden="true"></span><span><?php esc_html_e( 'Buy me a coffee', 'wpmethods-social-chat-floating-icons' ); ?></span><span class="wpmesoch-link-arrow" aria-hidden="true">&nearr;</span></a><a href="https://www.youtube.com/@TechTriggerBD" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'YouTube · TechTriggerBD', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a><a href="https://wpmethods.com" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Visit WPMethods', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a></div>
 		</aside>
 		<?php
@@ -316,6 +316,7 @@ class Wpmesoch_Admin_Settings {
 										'max' => 96,
 									)
 								);
+								$this->field( $options, 'show_labels', __( 'Show channel labels', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Slide the channel name into view on hover or keyboard focus. Labels automatically appear beside the icon on the correct side for Left or Right placement.', 'wpmethods-social-chat-floating-icons' ) );
 								$this->field( $options, 'load_fontawesome', __( 'Load Font Awesome', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Disable only if your theme or another plugin already loads compatible Font Awesome icons. Admin previews keep their local icons.', 'wpmethods-social-chat-floating-icons' ) );
 								?>
 							</div></div>
@@ -341,18 +342,19 @@ class Wpmesoch_Admin_Settings {
 </div><code>#lcWpmethodsChatContainer .wpmesoch-panel { border-radius: 24px; }</code></div>
 </section>
 						<section class="wpmesoch-admin-tab-content" id="tab-chat" aria-labelledby="wpmesoch-tab-chat">
-							<div class="wpmesoch-section-heading"><span class="wpmesoch-eyebrow"><?php esc_html_e( 'WELCOME YOUR VISITORS', 'wpmethods-social-chat-floating-icons' ); ?></span><h2><?php esc_html_e( 'Chat panels & messages', 'wpmethods-social-chat-floating-icons' ); ?></h2><p><?php esc_html_e( 'Add a personal welcome before visitors continue to WhatsApp or Messenger.', 'wpmethods-social-chat-floating-icons' ); ?></p></div>
+							<div class="wpmesoch-section-heading"><span class="wpmesoch-eyebrow"><?php esc_html_e( 'WELCOME YOUR VISITORS', 'wpmethods-social-chat-floating-icons' ); ?></span><h2><?php esc_html_e( 'Chat panels & messages', 'wpmethods-social-chat-floating-icons' ); ?></h2><p><?php esc_html_e( 'Add a personal welcome before visitors continue to WhatsApp, Telegram or Messenger.', 'wpmethods-social-chat-floating-icons' ); ?></p></div>
 							<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Channel behavior', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
 								<?php
 								$this->field( $options, 'whatsapp_chatbox', __( 'WhatsApp chat panel', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Open a message composer before WhatsApp. Disable to open the contact link directly.', 'wpmethods-social-chat-floating-icons' ) );
+								$this->field( $options, 'telegram_chatbox', __( 'Telegram chat panel', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Open a message composer before Telegram. Use a public username link such as https://t.me/your_username. Disable to open Telegram directly with the prepared message.', 'wpmethods-social-chat-floating-icons' ) );
 								$this->field( $options, 'messenger_chatbox', __( 'Messenger chat panel', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Open a welcome panel before continuing to your m.me link.', 'wpmethods-social-chat-floating-icons' ) );
 								?>
 							</div></div>
 							<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Conversation copy', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
 								<?php
 								$this->field( $options, 'chat_title', __( 'Panel title', 'wpmethods-social-chat-floating-icons' ), 'text', __( 'Leave blank to use “How can we help?”.', 'wpmethods-social-chat-floating-icons' ) );
-								$this->field( $options, 'chat_greeting', __( 'Welcome message', 'wpmethods-social-chat-floating-icons' ), 'textarea', __( 'Displayed inside both chat panels. Leave blank for a welcome message offering help with products, delivery and orders.', 'wpmethods-social-chat-floating-icons' ) );
-								$this->field( $options, 'custom_text', __( 'WhatsApp prefilled message', 'wpmethods-social-chat-floating-icons' ), 'textarea', __( 'Included along with the visitor’s message and optional product details.', 'wpmethods-social-chat-floating-icons' ) );
+								$this->field( $options, 'chat_greeting', __( 'Welcome message', 'wpmethods-social-chat-floating-icons' ), 'textarea', __( 'Displayed inside all chat panels. Leave blank for a short welcome offering help with products and orders.', 'wpmethods-social-chat-floating-icons' ) );
+								$this->field( $options, 'custom_text', __( 'WhatsApp / Telegram prefilled message', 'wpmethods-social-chat-floating-icons' ), 'textarea', __( 'Included along with the visitor’s message and optional product details.', 'wpmethods-social-chat-floating-icons' ) );
 								?>
 							</div></div>
 						<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Automatic welcome prompt', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
@@ -394,7 +396,7 @@ class Wpmesoch_Admin_Settings {
 								<div class="wpmesoch-info"><?php esc_html_e( 'Activate WooCommerce to use product context. You can prepare your settings below.', 'wpmethods-social-chat-floating-icons' ); ?></div><?php endif; ?>
 							<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Product context', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
 								<?php
-								$this->field( $options, 'track_woo_product', __( 'Include product details', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Append the product name, price, link and selected variation to WhatsApp messages on single product pages.', 'wpmethods-social-chat-floating-icons' ) );
+								$this->field( $options, 'track_woo_product', __( 'Include product details', 'wpmethods-social-chat-floating-icons' ), 'checkbox', __( 'Append the product name, price, link and selected variation to WhatsApp and Telegram messages on single product pages.', 'wpmethods-social-chat-floating-icons' ) );
 								$this->field( $options, 'woo_product_msg', __( 'Product introduction', 'wpmethods-social-chat-floating-icons' ), 'textarea' );
 								$this->field( $options, 'woo_product_name', __( 'Product name label', 'wpmethods-social-chat-floating-icons' ) );
 								$this->field( $options, 'woo_product_price', __( 'Product price label', 'wpmethods-social-chat-floating-icons' ) );

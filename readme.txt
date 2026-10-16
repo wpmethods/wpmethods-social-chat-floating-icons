@@ -85,7 +85,7 @@ Disable it when your theme or another plugin already loads compatible Font Aweso
 The local panels introduce the conversation. Visitors can write a message before continuing in WhatsApp. Messenger conversations open through your m.me link. Sending and receiving replies takes place in the selected service. These panels do not provide an embedded inbox or direct API messaging.
 
 = Which links open a chat panel? =
-Use https://wa.me/NUMBER, https://api.whatsapp.com/send?phone=NUMBER or https://web.whatsapp.com/send?phone=NUMBER for WhatsApp, and https://m.me/PAGE for Messenger. Other links open directly. Disabling a service's panel restores direct link behavior.
+Use https://wa.me/NUMBER, https://api.whatsapp.com/send?phone=NUMBER or https://web.whatsapp.com/send?phone=NUMBER for WhatsApp, and https://m.me/PAGE for Messenger,  https://t.me/your_username Telegram. Other links open directly. Disabling a service's panel restores direct link behavior.
 
 = Does the plugin load external services automatically? =
 No. The widget assets and fonts are bundled locally. No third-party chat SDK is loaded. When a visitor follows a contact link or continues into WhatsApp or Messenger, their browser opens that service. WhatsApp links may include the configured message, product information and the visitor's draft. The destination service processes the conversation under its own terms and privacy policy:
@@ -104,13 +104,14 @@ You, can set from wp-admin > Chat Floating Icons > the left help sidebar. Here y
 
 == Screenshots ==
 
-1. Floating Chat Icon Widget: Add beautifully styled floating chat icons to any page or post.
-2. Fully Customizable Styles: Set your own icon color, background color (including gradients), and label text for each link.
-3. Support WooCommerce Product: If customers click on the link from the product page, then it will be automatically append product price, name, attributes, variations etc.
-4. No Coding Required: Simple and intuitive admin panel to manage all settings.
-5. Supports Popular Platforms: Easily link to WhatsApp, Messenger, Telegram, Skype, WeChat, Viber, and more.
-6. Font Awesome 6 Icon Support: Use any Font Awesome 6 icon class to represent your social or chat platform.
-7. Customers can send you automatically product name, price, etc.
+1. Floating chat widget with WhatsApp, Messenger and Telegram icons and sliding channel labels.
+2. WhatsApp message composer and Messenger welcome panel on a WooCommerce storefront.
+3. Contact channel settings with expandable sections, enable switches, ordering controls and individual colors.
+4. Chat panel settings for enabling WhatsApp, Telegram and Messenger welcome panels.
+5. WooCommerce product context settings for including product names, prices, links and selected variations in WhatsApp and Telegram messages.
+6. WhatsApp conversation showing prepared product details, prices and selected variations.
+7. Appearance settings for choosing the widget icon and adjusting icon and button sizes.
+8. Widget color settings for backgrounds, gradients, icons, hover effects and the pulse ring.
 
 
 
