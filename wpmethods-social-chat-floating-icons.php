@@ -5,13 +5,12 @@
  * Plugin URI: https://wpmethods.com/product/wpmethods-social-chat-floating-icons
  * Author: WP Methods
  * Author URI: https://wpmethods.com/about
- * Version: 1.1.0
+ * Version: 1.1.1
  * Text Domain: wpmethods-social-chat-floating-icons
  * Contributors: wpmethods,ajharrashed
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 5.9
- * Tested up to: 7.1
  * Requires PHP: 7.4
  *
  * @package WPMESOCH
@@ -25,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WPMESOCH_WPMETHODS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPMESOCH_WPMETHODS_URL', plugin_dir_url( __FILE__ ) );
 
-define( 'WPMESOCH_PLUGIN_VERSION', '1.1.0' );
+define( 'WPMESOCH_PLUGIN_VERSION', '1.1.1' );
 
 // Autoload Classes.
 require_once WPMESOCH_WPMETHODS_PATH . 'file_autoloader/autoload.php';

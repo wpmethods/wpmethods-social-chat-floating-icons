@@ -121,7 +121,7 @@ class Wpmesoch_Admin_Settings {
 				<input type="hidden" name="wpmesoch_settings[<?php echo esc_attr( $key ); ?>]" value="0" />
 				<input class="wpmesoch-switch" type="checkbox" id="<?php echo esc_attr( $id ); ?>" name="wpmesoch_settings[<?php echo esc_attr( $key ); ?>]" value="1" <?php checked( $value, '1' ); ?> aria-describedby="<?php echo esc_attr( $id . '-help' ); ?>" />
 			<?php elseif ( 'textarea' === $type ) : ?>
-				<textarea id="<?php echo esc_attr( $id ); ?>" name="wpmesoch_settings[<?php echo esc_attr( $key ); ?>]" rows="3" spellcheck="<?php echo 'custom_css' === $key ? 'false' : 'true'; ?>" aria-describedby="<?php echo esc_attr( $id . '-help' ); ?>"><?php echo esc_textarea( $value ); ?></textarea>
+				<textarea id="<?php echo esc_attr( $id ); ?>" name="wpmesoch_settings[<?php echo esc_attr( $key ); ?>]" rows="3" spellcheck="true" aria-describedby="<?php echo esc_attr( $id . '-help' ); ?>"><?php echo esc_textarea( $value ); ?></textarea>
 			<?php elseif ( 'position' === $type ) : ?>
 				<select id="<?php echo esc_attr( $id ); ?>" name="wpmesoch_settings[<?php echo esc_attr( $key ); ?>]" aria-describedby="<?php echo esc_attr( $id . '-help' ); ?>">
 					<option value="right" <?php selected( $value, 'right' ); ?>><?php esc_html_e( 'Right', 'wpmethods-social-chat-floating-icons' ); ?></option>
@@ -189,6 +189,35 @@ class Wpmesoch_Admin_Settings {
 
 	/** Render help and community links in the left sidebar. */
 	private function sidebar() {
+		$products = array(
+			array(
+				'name'        => 'Refmora',
+				'url'         => 'https://wordpress.org/plugins/refmora/',
+				'image'       => 'refmora.gif',
+				'accent'      => 'refmora',
+				'description' => __( 'Add a referral and affiliate program to WooCommerce.', 'wpmethods-social-chat-floating-icons' ),
+				'type'        => __( 'Free plugin', 'wpmethods-social-chat-floating-icons' ),
+				'source'      => 'WordPress.org',
+			),
+			array(
+				'name'        => 'Order List Table',
+				'url'         => 'https://wordpress.org/plugins/order-list-table-elementor-widget/',
+				'image'       => 'order-list-table.gif',
+				'accent'      => 'orders',
+				'description' => __( 'Display WooCommerce orders on the frontend with Elementor.', 'wpmethods-social-chat-floating-icons' ),
+				'type'        => __( 'Free plugin', 'wpmethods-social-chat-floating-icons' ),
+				'source'      => 'WordPress.org',
+			),
+			array(
+				'name'        => 'Click Shop',
+				'url'         => 'https://wpmethods.com/product/click-shop-wordpress-landing-page-type-ecommerce-theme/',
+				'image'       => 'click-shop.webp',
+				'accent'      => 'theme',
+				'description' => __( 'Create an ecommerce storefront with WooCommerce.', 'wpmethods-social-chat-floating-icons' ),
+				'type'        => __( 'Paid theme', 'wpmethods-social-chat-floating-icons' ),
+				'source'      => 'WPMethods.com',
+			),
+		);
 		$services = array(
 			'WhatsApp'    => array( 'https://wa.me/15551234567', 'fab fa-whatsapp' ),
 			'Messenger'   => array( 'https://m.me/your-page', 'fab fa-facebook-messenger' ),
@@ -223,6 +252,26 @@ class Wpmesoch_Admin_Settings {
 					<code><?php echo esc_html( $icon ); ?></code><?php endforeach; ?>
 			</div><a href="https://fontawesome.com/v6/search?o=r&m=free" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Browse free icons', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a></details>
 			<details><summary><?php esc_html_e( 'Chat panels & Font Awesome', 'wpmethods-social-chat-floating-icons' ); ?></summary><p><?php esc_html_e( 'WhatsApp, Telegram and Messenger panels open before continuing in the messaging app. Replies are received in that app.', 'wpmethods-social-chat-floating-icons' ); ?></p><p><?php esc_html_e( 'Keep Load Font Awesome enabled unless your theme or another plugin already supplies compatible icons. This setting controls frontend loading; admin previews always load local icons.', 'wpmethods-social-chat-floating-icons' ); ?></p></details>
+			<section class="wpmesoch-products" aria-labelledby="wpmesoch-products-heading">
+				<h2 id="wpmesoch-products-heading"><?php esc_html_e( 'Other products', 'wpmethods-social-chat-floating-icons' ); ?></h2>
+				<p class="wpmesoch-products-intro"><?php esc_html_e( 'Optional tools from WPMethods.', 'wpmethods-social-chat-floating-icons' ); ?></p>
+				<ul class="wpmesoch-product-list">
+					<?php foreach ( $products as $product ) : ?>
+						<li>
+							<a class="wpmesoch-product-link wpmesoch-product-<?php echo esc_attr( $product['accent'] ); ?>" href="<?php echo esc_url( $product['url'] ); ?>" target="_blank" rel="noopener noreferrer">
+								<img class="wpmesoch-product-image" src="<?php echo esc_url( WPMESOCH_WPMETHODS_URL . 'assets/img/' . $product['image'] ); ?>" width="48" height="48" alt="" loading="lazy" decoding="async" />
+								<span class="wpmesoch-product-copy">
+									<strong class="wpmesoch-product-name"><?php echo esc_html( $product['name'] ); ?></strong>
+									<span class="wpmesoch-product-description"><?php echo esc_html( $product['description'] ); ?></span>
+									<span class="wpmesoch-product-meta"><span class="wpmesoch-product-type"><?php echo esc_html( $product['type'] ); ?></span><span><?php echo esc_html( $product['source'] ); ?></span></span>
+								</span>
+								<span class="wpmesoch-product-arrow dashicons dashicons-external" aria-hidden="true"></span>
+								<span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'wpmethods-social-chat-floating-icons' ); ?></span>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</section>
 			<div class="wpmesoch-community"><span class="wpmesoch-eyebrow"><?php esc_html_e( 'MADE WITH CARE', 'wpmethods-social-chat-floating-icons' ); ?></span><p><?php esc_html_e( 'Enjoying the plugin? Support the creator or explore more tutorials and tools.', 'wpmethods-social-chat-floating-icons' ); ?></p><a class="wpmesoch-coffee" href="https://buymeacoffee.com/ajharrashed" target="_blank" rel="noopener noreferrer"><span class="dashicons dashicons-coffee" aria-hidden="true"></span><span><?php esc_html_e( 'Buy me a coffee', 'wpmethods-social-chat-floating-icons' ); ?></span><span class="wpmesoch-link-arrow" aria-hidden="true">&nearr;</span></a><a href="https://www.youtube.com/@TechTriggerBD" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'YouTube · TechTriggerBD', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a><a href="https://wpmethods.com" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Visit WPMethods', 'wpmethods-social-chat-floating-icons' ); ?> &nearr;</a></div>
 		</aside>
 		<?php
@@ -337,10 +386,7 @@ class Wpmesoch_Admin_Settings {
 								$this->field( $options, 'right_offset', __( 'Right offset', 'wpmethods-social-chat-floating-icons' ), 'text', __( 'Used when the screen side is Right.', 'wpmethods-social-chat-floating-icons' ) );
 								?>
 							</div></div>
-						<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Custom CSS', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
-		<?php $this->field( $options, 'custom_css', __( 'Custom CSS', 'wpmethods-social-chat-floating-icons' ), 'textarea', __( 'Add CSS only, without style tags. Use #lcWpmethodsChatContainer before your selectors to target this widget. Rules are loaded after the default widget styles.', 'wpmethods-social-chat-floating-icons' ) ); ?>
-</div><code>#lcWpmethodsChatContainer .wpmesoch-panel { border-radius: 24px; }</code></div>
-</section>
+						</section>
 						<section class="wpmesoch-admin-tab-content" id="tab-chat" aria-labelledby="wpmesoch-tab-chat">
 							<div class="wpmesoch-section-heading"><span class="wpmesoch-eyebrow"><?php esc_html_e( 'WELCOME YOUR VISITORS', 'wpmethods-social-chat-floating-icons' ); ?></span><h2><?php esc_html_e( 'Chat panels & messages', 'wpmethods-social-chat-floating-icons' ); ?></h2><p><?php esc_html_e( 'Add a personal welcome before visitors continue to WhatsApp, Telegram or Messenger.', 'wpmethods-social-chat-floating-icons' ); ?></p></div>
 							<div class="wpmesoch-settings-card"><h3><?php esc_html_e( 'Channel behavior', 'wpmethods-social-chat-floating-icons' ); ?></h3><div class="wpmesoch-fields-grid">
@@ -423,7 +469,7 @@ class Wpmesoch_Admin_Settings {
 							<?php submit_button( __( 'Save changes', 'wpmethods-social-chat-floating-icons' ), 'primary', 'submit', false ); ?>
 						</div>
 					</form>
-					<footer class="wpmesoch-admin-footer"><?php esc_html_e( 'Crafted by', 'wpmethods-social-chat-floating-icons' ); ?> <a href="https://wpmethods.com" target="_blank" rel="noopener noreferrer">WPMethods</a><span aria-hidden="true">·</span><?php esc_html_e( 'Helping your visitors feel connected.', 'wpmethods-social-chat-floating-icons' ); ?></footer>
+					<footer class="wpmesoch-admin-footer"><?php esc_html_e( 'Developed by', 'wpmethods-social-chat-floating-icons' ); ?> <a href="https://wpmethods.com" target="_blank" rel="noopener noreferrer">WPMethods</a><span aria-hidden="true">·</span><?php esc_html_e( 'Helping your visitors feel connected.', 'wpmethods-social-chat-floating-icons' ); ?></footer>
 				</main>
 			</div>
 		</div>

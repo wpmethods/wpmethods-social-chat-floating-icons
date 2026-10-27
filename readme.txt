@@ -4,7 +4,7 @@ Tags: Social Chat Floating Icon, live chat, facebook messenger, whatsapp live ch
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,9 +72,6 @@ Yes. Use its Enabled switch in Contact channels, then save changes. Disabled cha
 = Is every feature free? =
 Yes. All features and unlimited contact channels are included, without a license key or paid upgrade.
 
-= Where can I add custom CSS? =
-Open Chat Floating Icons > Appearance > Custom CSS. Enter CSS without style tags. Prefix selectors with #lcWpmethodsChatContainer to target the widget. Custom rules load after the built-in styles.
-
 = Where are the new options? =
 Open Chat Floating Icons > Appearance for icon loading, colors and placement. Open Chat panels for WhatsApp and Messenger behavior, title and welcome message. Help and URL examples are in the left sidebar. A single configured contact shows its own button; two or more contacts use the widget launcher.
 
@@ -116,6 +113,9 @@ You, can set from wp-admin > Chat Floating Icons > the left help sidebar. Here y
 
 
 == Changelog ==
+= 1.1.1 =
+* Fixed some minor issues
+
 = 1.1.0 =
 * Added the Load Font Awesome switch, enabled by default for existing settings.
 * Added WhatsApp and Messenger panels with title and greeting settings.
@@ -127,12 +127,3 @@ You, can set from wp-admin > Chat Floating Icons > the left help sidebar. Here y
 
 = 1.0.0 =
 * Plugin initial release.
-
-== Upgrade Notice ==
-= 1.1.0 =
-All features and unlimited channels are now completely free. Custom CSS is available in Appearance. Clear page and asset caches to see the softer panel styling.
-
-Settings are now grouped under Contact channels, Appearance, Chat panels and WooCommerce. One contact now appears directly. Review your frontend after clearing page and asset caches.
-
-= 1.1.0 =
-Chat and icon loading settings are available on the plugin settings screen. Review the new panels after upgrading. Disable Load Font Awesome only if your theme or another plugin supplies compatible icons.

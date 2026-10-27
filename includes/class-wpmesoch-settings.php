@@ -51,8 +51,6 @@ class Wpmesoch_Settings {
 		$output['welcome_text']    = sanitize_textarea_field( self::text( $input['welcome_text'] ?? '' ) );
 		$output['welcome_delay']   = self::number( $input['welcome_delay'] ?? 4, 0, 300, 4 );
 		$output['welcome_badge']   = self::number( $input['welcome_badge'] ?? 1, 0, 99, 1 );
-		// Keep CSS syntax intact while preventing full or partial HTML style breakouts.
-		$output['custom_css'] = str_replace( array( '<', "\0" ), array( '\\3C ', '' ), wp_strip_all_tags( self::text( $input['custom_css'] ?? '' ) ) );
 		foreach ( array( 'load_fontawesome', 'whatsapp_chatbox', 'messenger_chatbox', 'telegram_chatbox', 'show_labels' ) as $key ) {
 			$output[ $key ] = ! isset( $input[ $key ] ) || '1' === self::text( $input[ $key ] ) ? '1' : '0';
 		}

@@ -32,6 +32,21 @@
 .wpmesoch-service-examples strong { display: block; margin-bottom: 5px; font-size: 12px; }
 .wpmesoch-sidebar code { display: block; padding: 5px 7px; margin: 3px 0; background: #f4f7f8; border-radius: 5px; color: #3a5565; font-size: 10px; overflow-wrap: anywhere; white-space: normal; }
 .wpmesoch-icon-examples { margin-bottom: 12px; }
+.wpmesoch-products { padding: 22px; border-top: 1px solid var(--wpm-border); background: #f8faff; }
+.wpmesoch-sidebar .wpmesoch-products h2 { margin: 0 0 5px; font-size: 16px; }
+.wpmesoch-sidebar .wpmesoch-products-intro { margin: 0 0 16px; font-size: 12px; }
+.wpmesoch-product-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.wpmesoch-product-list > li { margin: 0; padding: 0; }
+.wpmesoch-admin .wpmesoch-product-link { display: grid; grid-template-columns: 48px minmax(0, 1fr) 12px; align-items: start; gap: 10px; padding: 13px 11px; border: 1px solid var(--wpm-border); border-radius: 10px; background: #fff; color: var(--wpm-ink); text-decoration: none; }
+.wpmesoch-admin .wpmesoch-product-link:hover { border-color: #a8bfe9; background: #fcfdff; color: var(--wpm-ink); }
+.wpmesoch-product-image { display: block; width: 48px; height: 48px; object-fit: contain; border: 1px solid #e7ecf2; border-radius: 8px; background: #fff; }
+.wpmesoch-product-copy { min-width: 0; }
+.wpmesoch-product-name { display: block; color: var(--wpm-ink); font-size: 12px; line-height: 1.5; font-weight: 650; }
+.wpmesoch-product-description { display: block; margin-top: 4px; color: var(--wpm-muted); font-size: 11px; line-height: 1.65; }
+.wpmesoch-product-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 7px; margin-top: 9px; color: var(--wpm-muted); font-size: 9px; line-height: 1.5; }
+.wpmesoch-product-type { padding: 2px 5px; border-radius: 4px; background: #f0f4f8; color: #43576a; font-weight: 600; }
+.wpmesoch-product-theme .wpmesoch-product-type { background: #fff3df; color: #805410; }
+.wpmesoch-product-arrow.dashicons { width: 12px; height: 12px; margin-top: 3px; color: #7a8b9c; font-size: 12px; }
 .wpmesoch-community { padding: 22px; background: #f9fbfa; border-top: 1px solid var(--wpm-border); }
 .wpmesoch-community a { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 10px 0; font-size: 12px; text-decoration: none; font-weight: 600; }
 .wpmesoch-community .wpmesoch-coffee { justify-content: center; gap: 9px; min-height: 44px; padding: 11px 14px; margin: 16px 0 8px; border: 1px solid #efd26d; border-radius: 9px; background: #fff0ad; color: #493911; font-size: 13px; font-weight: 600; line-height: 1.4; box-shadow: 0 2px 4px #49391106; transition: background .15s ease, border-color .15s ease; }
@@ -106,8 +121,6 @@
 @media (max-width: 960px) { .wpmesoch-admin { margin-right: 16px; } .wpmesoch-admin-layout { grid-template-columns: 220px minmax(0, 1fr); gap: 16px; } .wpmesoch-fields-grid { grid-template-columns: 1fr; } .wpmesoch-admin-tabs { flex-wrap: wrap; } .wpmesoch-admin-tab-button { flex-basis: 40%; } .wpmesoch-channel-header { flex-wrap: wrap; } }
 @media (max-width: 700px) { .wpmesoch-admin { margin: 16px 12px 0 0; } .wpmesoch-admin-header { padding: 22px; } .wpmesoch-admin-layout { display: flex; flex-direction: column; } .wpmesoch-sidebar { width: 100%; order: 2; } .wpmesoch-admin-main { width: 100%; } .wpmesoch-save-bar { bottom: 8px; padding: 14px; } .wpmesoch-save-status { max-width: 50%; } .wpmesoch-section-heading h2 { font-size: 20px; } .wpmesoch-brand div > span { font-size: 11px; } .wpmesoch-add-channel { flex-wrap: wrap; } }
 @media (prefers-reduced-motion: reduce) { .wpmesoch-admin *, .wpmesoch-admin *::before { transition: none !important; } }
-.wpmesoch-field textarea#wpmesoch-custom_css { min-height: 220px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; line-height: 1.7; tab-size: 4; }
-
 .wpmesoch-channel-visibility { display: inline-flex; align-items: center; gap: 8px; padding-inline-end: 12px; margin-inline-end: 4px; border-inline-end: 1px solid #e1e8ec; cursor: pointer; }
 .wpmesoch-channel-state { min-width: 48px; color: #52677b; font-size: 12px; font-weight: 500; }
 .wpmesoch-channel-disabled .wpmesoch-channel-header { background: #f3f5f7; }

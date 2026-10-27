@@ -82,9 +82,6 @@ class Wpmesoch_Front_End {
 			'left' === $options['position'] ? 'flex-start' : 'flex-end'
 		);
 		wp_add_inline_style( 'wpmesoch-css', $css );
-		if ( '' !== $options['custom_css'] ) {
-			wp_add_inline_style( 'wpmesoch-css', $options['custom_css'] );
-		}
 		wp_enqueue_script( 'wpmesoch-js', WPMESOCH_WPMETHODS_URL . 'assets/js/front-end' . $suffix . '.js', array(), WPMESOCH_PLUGIN_VERSION, true );
 	}
 
@@ -123,11 +120,11 @@ class Wpmesoch_Front_End {
 		if ( empty( $options['wpmesoch_links'] ) ) {
 			return;
 		}
-		$single   = 1 === count( $options['wpmesoch_links'] );
+		$single          = 1 === count( $options['wpmesoch_links'] );
 		$product_message = $this->wpmesoch_get_product_message();
-		$message  = trim( $options['custom_text'] . "\n" . $product_message );
-		$title    = $options['chat_title'] ? $options['chat_title'] : __( 'How can we help?', 'wpmethods-social-chat-floating-icons' );
-		$greeting = $options['chat_greeting'] ? $options['chat_greeting'] : __( 'Hi! Need help with a product or order? Send us a message.', 'wpmethods-social-chat-floating-icons' );
+		$message         = trim( $options['custom_text'] . "\n" . $product_message );
+		$title           = $options['chat_title'] ? $options['chat_title'] : __( 'How can we help?', 'wpmethods-social-chat-floating-icons' );
+		$greeting        = $options['chat_greeting'] ? $options['chat_greeting'] : __( 'Hi! Need help with a product or order? Send us a message.', 'wpmethods-social-chat-floating-icons' );
 		?>
 		<div class="wpmesoch-chat-container <?php echo $single ? 'wpmesoch-single' : 'wpmesoch-multiple'; ?> wpmesoch-position-<?php echo esc_attr( $options['position'] ); ?>" id="lcWpmethodsChatContainer">
 			<?php if ( '1' === $options['welcome_enabled'] ) : ?>
@@ -142,10 +139,14 @@ class Wpmesoch_Front_End {
 			<div class="wpmesoch-chat-options" id="wpmesoch-chat-options">
 				<?php
 				foreach ( $options['wpmesoch_links'] as $link ) :
-					$service    = $this->service( $link['url'] );
-					$service_labels = array( 'whatsapp' => 'WhatsApp', 'messenger' => 'Messenger', 'telegram' => 'Telegram' );
-					$label      = $link['label'] ? $link['label'] : ( $service_labels[ $service ] ?? __( 'Open contact link', 'wpmethods-social-chat-floating-icons' ) );
-					$background = $link['s_bg_color'] ? 'linear-gradient(120deg,' . $link['bg_color'] . ',' . $link['s_bg_color'] . ')' : $link['bg_color'];
+					$service        = $this->service( $link['url'] );
+					$service_labels = array(
+						'whatsapp'  => 'WhatsApp',
+						'messenger' => 'Messenger',
+						'telegram'  => 'Telegram',
+					);
+					$label          = $link['label'] ? $link['label'] : ( $service_labels[ $service ] ?? __( 'Open contact link', 'wpmethods-social-chat-floating-icons' ) );
+					$background     = $link['s_bg_color'] ? 'linear-gradient(120deg,' . $link['bg_color'] . ',' . $link['s_bg_color'] . ')' : $link['bg_color'];
 					?>
 					<div class="sfiw-icons" style="--wpmesoch-channel-bg:<?php echo esc_attr( $background ); ?>;--wpmesoch-channel-color:<?php echo esc_attr( $link['color'] ); ?>;">
 						<?php if ( '1' === $options['show_labels'] ) : ?>
